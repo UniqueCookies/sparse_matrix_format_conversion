@@ -6,18 +6,10 @@ mat = mmread('baseball.mtx')
 with open('baseball_labels.txt') as file:
     labels = file.read().splitlines()
 
-'''''
-random_team = random.choice(labels)
-i = labels.index(random_team)
-print(f'In 2022, the {random_team} played:')
-row = mat.getrow(i)
-for (j, num_games) in zip(row.indices, row.data):
-    print(f'{num_games} games against {labels[j]}')
-'''''
 #convert to csr matrix
 mat = mat.tocsr() #convert to csr matrix
 
-def vertex_vertex(mat):
+def vertex_vertex(mat): #make it into a large big matrix..
     m,n = mat.shape #get shape
     length = len(mat.indptr)
     A = np.zeros((m,n))
@@ -27,8 +19,10 @@ def vertex_vertex(mat):
         end = mat.indptr[z+1]
         for k in range(start,end):
             j = mat.indices[k] #get which column to add
-            A[i,j]=mat.data[k] #add the column
+            A[i,j]=1 #add the column
         i = i+1
-    return A
-
-
+    return A #make i
+def vertex_vertex_sparse(mat):  ##make sure the matrix is in SCR format
+    length = len(mat.data)
+    mat.data = np.ones(length)
+    return mat
