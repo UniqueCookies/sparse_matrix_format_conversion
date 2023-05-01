@@ -25,7 +25,7 @@ def vertex_vertex_sparse(mat):  ##make sure the matrix is in SCR format
     mat.data = np.ones(length)
     return mat
 def vertex_edge(mat):
-    mat = mat.tocoo()
+    mat = mat.tocoo() #work with COO format
     m = mat.shape[0]
     n = len(mat.data)
     A = np.zeros((m,n))
@@ -35,3 +35,7 @@ def vertex_edge(mat):
         A[a,i]=1
         A[b,i]=1
     return A
+A = vertex_edge(mat)
+unique, counts = np.unique(A[0,], return_counts=True)
+print(dict(zip(unique, counts)))
+#vertex_edge sparse format
