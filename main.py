@@ -5,11 +5,8 @@ import random
 mat = mmread('baseball.mtx')
 with open('baseball_labels.txt') as file:
     labels = file.read().splitlines()
-
-#convert to csr matrix
-mat = mat.tocsr() #convert to csr matrix
-
 def vertex_vertex(mat): #make it into a large big matrix..
+    mat = mat.tocsr()
     m,n = mat.shape #get shape
     length = len(mat.indptr)
     A = np.zeros((m,n))
@@ -23,6 +20,18 @@ def vertex_vertex(mat): #make it into a large big matrix..
         i = i+1
     return A #make i
 def vertex_vertex_sparse(mat):  ##make sure the matrix is in SCR format
+    mat = mat.tocsr()
     length = len(mat.data)
     mat.data = np.ones(length)
     return mat
+def vertex_edge(mat):
+    mat = mat.tocoo()
+    m = mat.shape[0]
+    n = len(mat.data)
+    A = np.zeros((m,n))
+    for i in range(n):
+        a = mat.row[i]
+        b = mat.col[i]
+        A[a,i]=1
+        A[b,i]=1
+    return A
