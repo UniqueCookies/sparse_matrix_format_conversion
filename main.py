@@ -27,15 +27,14 @@ def vertex_vertex_sparse(mat):  ##make sure the matrix is in SCR format
 def vertex_edge(mat):
     mat = mat.tocoo() #work with COO format
     m = mat.shape[0]
-    n = len(mat.data)
+    n = len(mat.data)//2
     A = np.zeros((m,n))
     for i in range(n):
         a = mat.row[i]
         b = mat.col[i]
-        A[a,i]=1
-        A[b,i]=1
-    return A
-A = vertex_edge(mat)
-unique, counts = np.unique(A[0,], return_counts=True)
-print(dict(zip(unique, counts)))
+        if a>=b:
+            A[a,i]=1
+            A[b,i]=1
+    return A  #upper Traingle matrix
+
 #vertex_edge sparse format
