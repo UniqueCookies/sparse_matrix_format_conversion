@@ -38,10 +38,9 @@ def vertex_edge(mat):
             A[b,i]=1
     return A  #upper Traingle matrix
 
-#vertex_edge sparse format
+#vertex_edge sparse format ---- NOT DONE
 
 #Laplacian matrix
-
 def laplacian_matrix_sparse(mat):
     mat = mat.tocsr()
     length = len(mat.indptr)-1
@@ -51,9 +50,28 @@ def laplacian_matrix_sparse(mat):
         end = mat.indptr[i+1]
         d = sum(mat.data[start:end])
         diagonal[i]=d
-    indices = [i for i in range(30)]
+    indices = [i for i in range(length)]
     D = sp.coo_matrix((diagonal,(indices,indices)))
     D = D.tocsr()
-    return D-mat
+    laplacian = D - mat
+    return laplacian,D
+
+#Modularity matrix
+def modularity_matrix_sparse(mat):
+    mat = mat.tocsr()
+    T = sum(mat.data)
+    laplacian, d = laplacian_matrix_sparse(mat)
+    m = d.T @d
+    B = mat - (1/T)*m
+    return B
 
 
+data = [1,2,3,5]
+row =[0,0,1,2]
+col = [0,1,1,2]
+mat = sp.coo_matrix((data,(row,col)))
+mat = mat.tocsr()
+
+k,d=laplacian_matrix_sparse(mat)
+b = modularity_matrix_sparse(mat)
+#print(b)
