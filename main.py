@@ -1,4 +1,5 @@
 from scipy.io import mmread
+import scipy.sparse as sp
 import numpy as np
 import random
 
@@ -19,11 +20,11 @@ def vertex_vertex(mat): #make it into a large big matrix..
             A[i,j]=1 #add the column
         i = i+1
     return A #make i
-def vertex_vertex_sparse(mat):  ##make sure the matrix is in SCR format
+def vertex_vertex_sparse(mat):
     mat = mat.tocsr()
     length = len(mat.data)
     mat.data = np.ones(length)
-    return mat
+    return mat #return SCR format
 def vertex_edge(mat):
     mat = mat.tocoo() #work with COO format
     m = mat.shape[0]
@@ -38,3 +39,21 @@ def vertex_edge(mat):
     return A  #upper Traingle matrix
 
 #vertex_edge sparse format
+
+#Laplacian matrix
+
+def laplacian_matrix_sparse(mat):
+    mat = mat.tocsr()
+    length = len(mat.indptr)-1
+    diagonal = np.zeros(length)
+    for i in range (length):
+        start = mat.indptr[i]
+        end = mat.indptr[i+1]
+        d = sum(mat.data[start:end])
+        diagonal[i]=d
+    indices = [i for i in range(30)]
+    D = sp.coo_matrix((diagonal,(indices,indices)))
+    D = D.tocsr()
+    return D-mat
+
+
