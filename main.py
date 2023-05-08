@@ -3,9 +3,10 @@ import scipy.sparse as sp
 import numpy as np
 import random
 
-mat = mmread('baseball.mtx')
+baseball = mmread('baseball.mtx')
 with open('baseball_labels.txt') as file:
     labels = file.read().splitlines()
+
 def vertex_vertex(mat): #make it into a large big matrix..
     mat = mat.tocsr()
     m,n = mat.shape #get shape
@@ -46,7 +47,7 @@ def vertex_edge_sparse(mat):
     data = np.ones(length)
     vertex = np.ones(length)
     edge = np.ones(length)
-    n = 0
+    n = 0 #count number of edges
     for i in range (length):
         if mat.row[i]>mat.col[i]:
             vertex[i]=mat.row[i]
@@ -56,38 +57,26 @@ def vertex_edge_sparse(mat):
             n=n+1
     ve = sp.coo_matrix((data, (vertex, edge)),shape=(int(np.max(vertex))+1, int(np.max(edge))+1))
     return ve
-
 #Laplacian matrix
 def laplacian_matrix_sparse(mat):
     mat = mat.tocsr()
-    length = len(mat.indptr)-1
-    diagonal = np.zeros(length)
-    for i in range (length):
-        start = mat.indptr[i]
-        end = mat.indptr[i+1]
-        d = sum(mat.data[start:end])
-        diagonal[i]=d
+    length = mat.shape[1]
+    d = mat@np.ones(length)
     indices = [i for i in range(length)]
-    D = sp.coo_matrix((diagonal,(indices,indices)))
-    D = D.tocsr()
+    D = sp.coo_matrix((d,(indices,indices)))
     laplacian = D - mat
-    return laplacian,D
-
+    return laplacian
+#edge_edge sparse matrix
+def edge_edge_sparse(mat):
+    ve = vertex_edge_sparse(mat)
+    return ve@ve.T
 #Modularity matrix
-def modularity_matrix_sparse(mat):
-    mat = mat.tocsr()
+def modularity_matrix(mat):
     T = sum(mat.data)
-    laplacian, d = laplacian_matrix_sparse(mat)
-    m = d.T @d
-    B = mat - (1/T)*m
+    d = mat@np.ones((mat.shape[1],1))
+    B = mat - (1/T)*d@d.T
     return B
 
-data = np.ones(6)
-row =[0,1,1,2,2,3]
-col = [1,0,2,1,3,2]
-mat = sp.coo_matrix((data,(row,col)))
-mat = mat.tocsr()
-
-print(vertex_edge_sparse(mat).col)
-#print(vertex_edge_sparse(mat))
-#print(b)
+B= modularity_matrix(baseball)
+ve = edge_edge_sparse(baseball)
+print(ve)
