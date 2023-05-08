@@ -38,7 +38,24 @@ def vertex_edge(mat):
             A[b,i]=1
     return A  #upper Traingle matrix
 
+
 #vertex_edge sparse format ---- NOT DONE
+def vertex_edge_sparse(mat):
+    mat = mat.tocoo()
+    length = len(mat.data)
+    data = np.ones(length)
+    vertex = np.ones(length)
+    edge = np.ones(length)
+    n = 0
+    for i in range (length):
+        if mat.row[i]>mat.col[i]:
+            vertex[i]=mat.row[i]
+            vertex[-(i+1)]=mat.col[i]
+            edge[i]=n
+            edge[-(i+1)]=n
+            n=n+1
+    ve = sp.coo_matrix((data, (vertex, edge)),shape=(int(np.max(vertex))+1, int(np.max(edge))+1))
+    return ve
 
 #Laplacian matrix
 def laplacian_matrix_sparse(mat):
@@ -65,13 +82,12 @@ def modularity_matrix_sparse(mat):
     B = mat - (1/T)*m
     return B
 
-
-data = [1,2,3,5]
-row =[0,0,1,2]
-col = [0,1,1,2]
+data = np.ones(6)
+row =[0,1,1,2,2,3]
+col = [1,0,2,1,3,2]
 mat = sp.coo_matrix((data,(row,col)))
 mat = mat.tocsr()
 
-k,d=laplacian_matrix_sparse(mat)
-b = modularity_matrix_sparse(mat)
+print(vertex_edge_sparse(mat).col)
+#print(vertex_edge_sparse(mat))
 #print(b)
